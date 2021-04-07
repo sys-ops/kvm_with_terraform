@@ -6,20 +6,12 @@ provider "libvirt" {
   uri = "qemu:///system"
 }
 
-# fetch the latest ubuntu release image from their mirrors
+# get the latest ubuntu kvm image
 resource "libvirt_volume" "os_image" {
   name   = "${var.hostname}-os_image"
   pool   = "default"
   source = var.image
   format = "qcow2"
-}
-
-# Use CloudInit ISO to add ssh-key to the instance
-resource "libvirt_cloudinit_disk" "commoninit" {
-  name           = "${var.hostname}-commoninit.iso"
-  pool           = "default"
-  user_data      = data.template_file.user_data.rendered
-  network_config = data.template_file.network_config.rendered
 }
 
 data "template_file" "user_data" {
@@ -32,6 +24,14 @@ data "template_file" "user_data" {
 
 data "template_file" "network_config" {
   template = file("${path.module}/network.cfg")
+}
+
+# Use CloudInit ISO
+resource "libvirt_cloudinit_disk" "commoninit" {
+  name           = "${var.hostname}-commoninit.iso"
+  pool           = "default"
+  user_data      = data.template_file.user_data.rendered
+  network_config = data.template_file.network_config.rendered
 }
 
 # Create the machine
