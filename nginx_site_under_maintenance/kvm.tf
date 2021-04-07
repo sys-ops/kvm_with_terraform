@@ -62,7 +62,7 @@ resource "libvirt_domain" "domain-ubuntu" {
   }
 }
 
-# If there is no output refresh terraform
+# If there is no output run "terraform refresh"
 output "metadata" {
   value = libvirt_domain.domain-ubuntu.network_interface.*.addresses
 }
